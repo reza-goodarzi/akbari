@@ -7,6 +7,8 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import Header from '../components/Header'
+import Footer from '../components/Footer'
+import { CartProvider } from '../contexts/cart-context'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
@@ -29,7 +31,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'فروشگاه لوازم یدکی خودرو',
       },
     ],
     links: [
@@ -45,14 +47,16 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="fa" dir="rtl">
       <head>
         <HeadContent />
       </head>
       <body>
-        <Header />
-        {children}
-        <TanStackDevtools
+        <CartProvider>
+          <Header />
+          {children}
+          <Footer />
+          <TanStackDevtools
           config={{
             position: 'bottom-right',
           }}
@@ -63,7 +67,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             },
             TanStackQueryDevtools,
           ]}
-        />
+          />
+        </CartProvider>
         <Scripts />
       </body>
     </html>
