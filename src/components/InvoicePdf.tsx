@@ -1,4 +1,4 @@
-import {  Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 // PDF Styles
 const styles = StyleSheet.create({
@@ -64,8 +64,8 @@ export const InvoicePDF = ({
   invoiceNumber: string;
   date: string;
 }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
+  <Document language="fa" style={{ textAlign: "right" }}>
+    <Page style={styles.page}>
       <Text style={styles.title}>فاکتور فروش</Text>
       <Text style={{ marginBottom: 10 }}>شماره فاکتور: {invoiceNumber}</Text>
       <Text style={{ marginBottom: 20 }}>تاریخ: {date}</Text>
