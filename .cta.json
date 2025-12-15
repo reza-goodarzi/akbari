@@ -13,7 +13,6 @@
     "start",
     "shadcn",
     "t3env",
-    "strapi",
     "tanstack-query"
   ]
 }
