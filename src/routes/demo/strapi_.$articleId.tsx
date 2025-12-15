@@ -1,16 +1,39 @@
 import { articles } from '@/lib/strapiClient'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
+type LoaderData = {
+  article: any | null
+  error?: string
+}
+
 export const Route = createFileRoute('/demo/strapi_/$articleId')({
   component: RouteComponent,
-  loader: async ({ params }) => {
-    const { data: article } = await articles.findOne(params.articleId)
-    return article
+  loader: async ({ params }): Promise<LoaderData> => {
+    try {
+      const baseURL = import.meta.env.VITE_STRAPI_URL
+      if (!baseURL) {
+        return {
+          article: null,
+          error:
+            'VITE_STRAPI_URL is not configured. Set this environment variable in Vercel project settings.',
+        }
+      }
+
+      const { data: article } = await articles.findOne(params.articleId)
+      return { article: article ?? null }
+    } catch (error) {
+      console.error('Failed to load Strapi article', error)
+      return {
+        article: null,
+        error:
+          'خطا در دریافت مقاله از Strapi. لطفاً بعداً دوباره تلاش کنید یا تنظیمات سرور را بررسی کنید.',
+      }
+    }
   },
 })
 
 function RouteComponent() {
-  const article = Route.useLoaderData()
+  const { article, error } = Route.useLoaderData() as LoaderData
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-8">
@@ -34,44 +57,54 @@ function RouteComponent() {
           Back to Articles
         </Link>
 
-        <article className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            {article?.title || 'Untitled'}
-          </h1>
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            {error}
+          </div>
+        )}
 
-          {article?.createdAt && (
-            <p className="text-sm text-cyan-400/70 mb-6">
-              Published on{' '}
-              {new Date(article?.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </p>
-          )}
+        {article ? (
+          <article className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
+            <h1 className="text-4xl font-bold text-white mb-4">
+              {article?.title || 'Untitled'}
+            </h1>
 
-          {article?.description && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-300 mb-3">
-                Description
-              </h2>
-              <p className="text-gray-400 leading-relaxed">
-                {article?.description}
+            {article?.createdAt && (
+              <p className="text-sm text-cyan-400/70 mb-6">
+                Published on{' '}
+                {new Date(article?.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
               </p>
-            </div>
-          )}
+            )}
 
-          {article?.content && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-300 mb-3">
-                Content
-              </h2>
-              <div className="text-gray-400 leading-relaxed whitespace-pre-wrap">
-                {article?.content}
+            {article?.description && (
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-300 mb-3">
+                  Description
+                </h2>
+                <p className="text-gray-400 leading-relaxed">
+                  {article?.description}
+                </p>
               </div>
-            </div>
-          )}
-        </article>
+            )}
+
+            {article?.content && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-300 mb-3">
+                  Content
+                </h2>
+                <div className="text-gray-400 leading-relaxed whitespace-pre-wrap">
+                  {article?.content}
+                </div>
+              </div>
+            )}
+          </article>
+        ) : !error ? (
+          <p className="text-gray-400">Article not found.</p>
+        ) : null}
       </div>
     </div>
   )

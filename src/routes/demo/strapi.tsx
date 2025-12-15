@@ -1,16 +1,41 @@
 import { articles } from '@/lib/strapiClient'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
+type LoaderData = {
+  articles: any[]
+  error?: string
+}
+
 export const Route = createFileRoute('/demo/strapi')({
   component: RouteComponent,
-  loader: async () => {
-    const { data: strapiArticles } = await articles.find()
-    return strapiArticles
+  loader: async (): Promise<LoaderData> => {
+    try {
+      const baseURL = import.meta.env.VITE_STRAPI_URL
+      if (!baseURL) {
+        // Don't crash the whole app on Vercel if env is missing
+        return {
+          articles: [],
+          error:
+            'VITE_STRAPI_URL is not configured. Set this environment variable in Vercel project settings.',
+        }
+      }
+
+      const { data: strapiArticles } = await articles.find()
+      return { articles: strapiArticles ?? [] }
+    } catch (error) {
+      // @strapi/client throws HTTPError for non‑2xx responses; we catch it here
+      console.error('Failed to load Strapi articles', error)
+      return {
+        articles: [],
+        error:
+          'خطا در برقراری ارتباط با Strapi. لطفاً بعداً دوباره تلاش کنید یا تنظیمات سرور را بررسی کنید.',
+      }
+    }
   },
 })
 
 function RouteComponent() {
-  const strapiArticles = Route.useLoaderData()
+  const { articles: strapiArticles, error } = Route.useLoaderData() as LoaderData
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-8">
@@ -21,6 +46,12 @@ function RouteComponent() {
           </span>{' '}
           <span className="text-gray-300">Articles</span>
         </h1>
+
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            {error}
+          </div>
+        )}
 
         {strapiArticles && strapiArticles.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -57,9 +88,9 @@ function RouteComponent() {
               </Link>
             ))}
           </div>
-        ) : (
+        ) : !error ? (
           <p className="text-gray-400">No articles found.</p>
-        )}
+        ) : null}
       </div>
     </div>
   )
