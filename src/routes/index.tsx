@@ -2,11 +2,11 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { ShoppingBag, Wrench, Shield, TrendingUp } from 'lucide-react'
 
-export const Route = createFileRoute('/')({
-  component: LandingPage,
-})
 
-function LandingPage() {
+export const Route = createFileRoute('/')({ component: App })
+
+
+function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
       {/* Hero Section */}
