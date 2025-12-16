@@ -8,7 +8,6 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { CartProvider } from '../contexts/cart-context'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
@@ -52,23 +51,21 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <CartProvider>
-          <Header />
-          {children}
-          <Footer />
-          <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-          />
-        </CartProvider>
+        <Header />
+        {children}
+        <Footer />
+        <TanStackDevtools
+        config={{
+          position: 'bottom-right',
+        }}
+        plugins={[
+          {
+            name: 'Tanstack Router',
+            render: <TanStackRouterDevtoolsPanel />,
+          },
+          TanStackQueryDevtools,
+        ]}
+        />
         <Scripts />
       </body>
     </html>

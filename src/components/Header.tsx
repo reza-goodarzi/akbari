@@ -1,13 +1,15 @@
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Menu, X, ShoppingCart, Home, Package } from 'lucide-react'
-import { useCart } from '@/contexts/cart-context'
+import { useCartStore } from '@/stores/cart-store'
 import { Button } from '@/components/ui/button'
+import { motion } from 'motion/react'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
-  const { getTotalItems } = useCart()
-  const cartItemsCount = getTotalItems()
+  const cartItemsCount = useCartStore((state) =>
+    state.items.reduce((total, item) => total + item.quantity, 0)
+  )
 
   return (
     <>
@@ -52,9 +54,13 @@ export default function Header() {
                 <Button variant="outline" size="icon" className="relative">
                   <ShoppingCart className="w-5 h-5" />
                   {cartItemsCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                    >
                       {cartItemsCount}
-                    </span>
+                    </motion.span>
                   )}
                 </Button>
               </Link>
@@ -65,9 +71,13 @@ export default function Header() {
                 <Button variant="outline" size="icon" className="relative">
                   <ShoppingCart className="w-5 h-5" />
                   {cartItemsCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                    >
                       {cartItemsCount}
-                    </span>
+                    </motion.span>
                   )}
                 </Button>
               </Link>
@@ -129,12 +139,16 @@ export default function Header() {
             }}
           >
             <ShoppingCart size={20} />
-            <span className="font-medium">
+            <span className="font-medium flex items-center gap-2">
               سبد خرید
               {cartItemsCount > 0 && (
-                <span className="mr-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="bg-red-500 text-white text-xs px-2 py-1 rounded-full"
+                >
                   {cartItemsCount}
-                </span>
+                </motion.span>
               )}
             </span>
           </Link>

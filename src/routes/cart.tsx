@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCart } from "@/contexts/cart-context";
+import { useCartStore } from "@/stores/cart-store";
 import {
   Trash2,
   Plus,
@@ -29,14 +29,19 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const {
-    items,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getTotalPrice,
-    getTotalItems,
-  } = useCart();
+  const items = useCartStore((state) => state.items);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const clearCart = useCartStore((state) => state.clearCart);
+  const totalPrice = useCartStore((state) =>
+    state.items.reduce(
+      (total, item) => total + item.product.price * item.quantity,
+      0
+    )
+  );
+  const totalItems = useCartStore((state) =>
+    state.items.reduce((total, item) => total + item.quantity, 0)
+  );
   const [showInvoice, setShowInvoice] = useState(false);
 
   const handleCheckout = () => {
@@ -49,7 +54,7 @@ function CartPage() {
     const doc = (
       <InvoicePDF
         items={items}
-        totalPrice={getTotalPrice()}
+        totalPrice={totalPrice}
         invoiceNumber={invoiceNumber}
         date={date}
       />
@@ -154,7 +159,7 @@ function CartPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">جمع کل:</span>
                   <span className="text-2xl font-bold text-green-600">
-                    {getTotalPrice().toLocaleString("fa-IR")} تومان
+                    {totalPrice.toLocaleString("fa-IR")} تومان
                   </span>
                 </div>
               </div>
@@ -171,7 +176,7 @@ function CartPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">سبد خرید</h1>
           <p className="text-slate-300">
-            {getTotalItems()} محصول در سبد خرید شما
+            {totalItems} محصول در سبد خرید شما
           </p>
         </div>
 
@@ -245,7 +250,7 @@ function CartPage() {
                                 }}
                                 min={1}
                                 max={item.product.stock}
-                                className="w-20 text-center"
+                                className="w-20 text-center text-white"
                               />
                               <Button
                                 variant="outline"
@@ -293,14 +298,14 @@ function CartPage() {
                 <div className="flex items-center justify-between text-slate-300">
                   <span>تعداد کل:</span>
                   <span className="font-bold text-white">
-                    {getTotalItems()} عدد
+                    {totalItems} عدد
                   </span>
                 </div>
                 <div className="border-t border-slate-700 pt-4">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-300 text-lg">جمع کل:</span>
                     <span className="text-green-400 font-bold text-2xl">
-                      {getTotalPrice().toLocaleString("fa-IR")} تومان
+                      {totalPrice.toLocaleString("fa-IR")} تومان
                     </span>
                   </div>
                 </div>
